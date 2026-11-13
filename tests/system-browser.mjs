@@ -57,7 +57,7 @@ try{
  await role('secretary');
  await page.screenshot({path:'artifacts/system-browser/baptism-management.png',fullPage:true});
  await page.locator('[data-sys-next="BAP-026"]').click();
- assert.match(await page.locator('#toast').innerText(),/Check every sponsor/);
+ assert.match(await page.locator('#toast').innerText(),/Complete the sponsor/);
  for(let i=0;i<3;i++)await page.locator('input[data-sys-check="BAP-026"]').nth(i).check();
  await next('BAP-026');
  assert.match(await page.locator('.sys-inspector').innerText(),/Requirements checked/);

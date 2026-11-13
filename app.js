@@ -40,7 +40,7 @@ let cases=seedCases(),role='administrator',route='workdesk',selectedId=null,quer
 const showcase=createShowcaseState();
 const displayDate=s=>s?safe(s):'—';
 const tone=s=>/released|archived|confirmed|complete|verified/i.test(s)?'green':/awaiting|missing|received|follow-up/i.test(s)?'amber':'blue';
-function pill(value){return '<span class="pill '+tone(value)+'">'+safe(value)+'</span>';}
+function pill(value){const label=String(value).replace(/\s*\(demo\)/gi,'').replace(/^Demo released$/i,'Released');return '<span class="pill '+tone(value)+'">'+safe(label)+'</span>';}
 function caseById(id){return cases.find(c=>c.id===id);}
 function now(){return new Date().toLocaleString('en-PH',{dateStyle:'medium',timeStyle:'short'});}
 function notice(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.hidden=true,4500);}
