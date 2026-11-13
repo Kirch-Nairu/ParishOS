@@ -14,7 +14,7 @@ test('R2 desk-first IA, secondary priest and meaningful case-route UI',()=>{
  assert.match(js,/data-open/);
 });
 test('demo safety, invalid print and no live data exchange',()=>{
- assert.match(html,/DEMO \/ INVALID/);
+ assert.match(html,/SAMPLE · INVALID/);
  assert.match(html,/No data is stored or sent/);
  assert.match(js,/SAMPLE · INVALID/);
  assert.match(js,/NO OFFICIAL SEAL/);
