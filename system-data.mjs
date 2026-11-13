@@ -136,6 +136,7 @@ export function transition(record,role,now='13 Nov 2026 · 16:00'){
  if(!(FLOW_ROLES[record.module]||[]).includes(role))return {ok:false,error:'The selected demo role is not assigned to this workflow.'};
  if(record.module==='priest_schedule'&&record.status==='Conflict')return {ok:false,error:'Resolve the overlapping duty before accepting.'};
  if(record.module==='priest_schedule'&&record.status==='Proposed'&&role!=='priest')return {ok:false,error:'Only the selected priest persona can accept this proposed assignment in the demo.'};
+ if(record.module==='finance'&&record.status==='For approval'&&role!=='administrator')return {ok:false,error:'A distinct simulated office administrator must review this voucher. The finance clerk cannot self-approve.'};
  if(record.module==='registry'&&next==='Review queued'&&role!=='records')return {ok:false,error:'Only the records desk may queue register annotation review.'};
  const before=record.status;
  const copy={...record,status:next, timeline:[...record.timeline,{at:now,actor:'Demo '+role,event:'Moved to '+next,note:'Simulated transition: '+before+' → '+next+'. No external or canonical state changed.'}]};

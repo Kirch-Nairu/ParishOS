@@ -1,4 +1,4 @@
-import {CATALOG, INDEX, createModuleData, transition, nextStatus} from './system-data.mjs';
+import {CATALOG, INDEX, FLOW_ROLES, createModuleData, transition, nextStatus} from './system-data.mjs';
 import {FINAL,nextStep} from './workflow.mjs';
 
 // All actions mutate this in-memory demonstration object only.
@@ -30,7 +30,7 @@ function hasRole(mod,role,record){
  if(mod==='registry')return ['records','administrator'].includes(role);
  if(mod==='collections')return ['finance','administrator'].includes(role);
  if(mod==='personnel')return role==='administrator';
- return ['administrator','secretary','records','clerk','finance','priest'].includes(role);
+ return (FLOW_ROLES[mod]||[]).includes(role);
 }
 function moduleStats(m,items){
  const current=items.length;

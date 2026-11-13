@@ -58,8 +58,17 @@ test('priest assignment does not auto-approve under wrong role',()=>{
  const c=createModuleData().find(x=>x.id==='PS-102');
  assert.equal(nextStatus(c),'Accepted (demo)');
  assert.equal(transition(c,'finance').ok,false);
- assert.equal(transition(c,'administrator').ok,true); // core policy permits office to update; companion has tighter view action gate
+ assert.equal(transition(c,'administrator').ok,false); // only the priest persona can accept a proposed assignment
  assert.equal(transition(c,'priest').record.status,'Accepted (demo)');
+});
+test('expense approval needs separate administrator attestation in demo',()=>{
+ const c=createModuleData().find(x=>x.id==='FIN-084');
+ assert.equal(transition(c,'finance').ok,false);
+ assert.equal(transition(c,'secretary').ok,false);
+ const result=transition(c,'administrator');
+ assert.equal(result.ok,true);
+ assert.equal(result.record.status,'Approved (demo)');
+ assert.equal(result.record.fields.find(x=>x.label==='Payment').value,'No real disbursement');
 });
 test('restricted donation remains purpose-bound after status transition',()=>{
  const c=createModuleData().find(x=>x.id==='DON-043');
