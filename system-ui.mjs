@@ -12,6 +12,15 @@ const moneyValue=s=>{const m=String(s).match(/₱[\d,]+(?:\.\d+)?/);return m?m[0
 const icon=(n)=>'<span class="sys-glyph" aria-hidden="true">'+(n||'▤')+'</span>';
 const dateStr='FRIDAY · 13 NOV 2026';
 const sections=['Rectory office','Sacraments & records','Pastoral & people','Finance & stewardship','Public & outreach','Optional services'];
+const DIRECTORY=[
+ {id:'workdesk',title:'Parish dashboard',section:'Rectory office',priority:'Essential',icon:'▦'},
+ {id:'inbox',title:'Parish secretariat',section:'Rectory office',priority:'Essential',icon:'▤'},
+ {id:'certificates',title:'Certificate center',section:'Sacraments & records',priority:'Essential',icon:'▣'},
+ {id:'marriage',title:'Wedding management',section:'Sacraments & records',priority:'Essential',icon:'◇'},
+ {id:'correspondence',title:'Correspondence',section:'Rectory office',priority:'High',icon:'✉'},
+ ...CATALOG.filter(m=>m.id!=='priest')
+];
+
 const recordMatches=(r,q)=>([r.id,r.title,r.subtitle,r.status,r.owner,r.date,r.tag,...r.fields.map(x=>x.value)].join(' ').toLowerCase().includes(q.toLowerCase()));
 function actionLabel(mod,next){
  if(!next)return 'No further demo actions';
@@ -84,7 +93,7 @@ export function renderDesk(state,cases){
  '<div class="sys-lower-grid"><section class="sys-panel"><div class="sys-panel-heading"><div><div class="sys-eyebrow">OPERATIONS / ACCESS</div><h2>Open a working module</h2><p>Explore every part of the connected parish system.</p></div><span class="sys-meta-tag">22 core modules</span></div><div class="sys-launch-grid">'+workflowCards.map(([id,title,sub,ic])=>'<button data-nav="'+id+'" type="button" class="sys-launch"><span class="sys-launch-icon">'+ic+'</span><strong>'+title+'</strong><small>'+sub+'</small><span>↗</span></button>').join('')+'</div></section>'+
  '<section class="sys-panel"><div class="sys-panel-heading"><div><div class="sys-eyebrow">DOCUMENT TRACEABILITY</div><h2>Latest recorded actions</h2><p>Actor, reference and case timeline.</p></div><button data-nav="audit" class="sys-link">Audit trail ↗</button></div><div class="sys-activity">'+recent.map(e=>'<div><span class="sys-activity-bullet"></span><p><strong>'+esc(e.what)+'</strong><small>'+esc(e.id)+' · '+esc(e.by)+'</small></p><time>'+esc(e.at)+'</time></div>').join('')+'</div></section></div>'+
  '<div class="sys-suite-heading"><div><span class="sys-eyebrow">MODULE DIRECTORY</span><h2>The complete parish operations suite</h2><p>From sacramental records to logistics and diocesan reporting.</p></div><button class="sys-btn light" data-sys-reset type="button">↻ Reset fictional data</button></div>'+
- '<div class="sys-directory">'+CATALOG.filter(m=>!['priest','public'].includes(m.id)).map(m=>'<button data-nav="'+m.id+'" type="button"><span class="sys-dir-icon">'+m.icon+'</span><strong>'+esc(m.title)+'</strong><span>'+esc(m.section)+'</span><small>'+esc(m.priority)+' ↗</small></button>').join('')+'</div>';
+ '<div class="sys-directory">'+DIRECTORY.map(m=>'<button data-nav="'+m.id+'" type="button"><span class="sys-dir-icon">'+m.icon+'</span><strong>'+esc(m.title)+'</strong><span>'+esc(m.section)+'</span><small>'+esc(m.priority)+' ↗</small></button>').join('')+'</div>';
 }
 function infoRows(r){return r.fields.map(f=>'<div class="sys-info"><dt>'+esc(f.label)+'</dt><dd>'+esc(f.value)+'</dd></div>').join('');}
 function checklist(state,r){
@@ -92,7 +101,9 @@ function checklist(state,r){
  return '<div class="sys-inspect-group"><h4>Supporting documents & requirements <span>'+r.docs.length+'</span></h4>'+r.docs.map((d,i)=>'<label class="sys-doc-check"><input type="checkbox" data-sys-check="'+esc(r.id)+'" data-sys-doc="'+i+'" '+(checked.includes(i)?'checked':'')+'><span><strong>'+esc(d)+'</strong><small>'+(checked.includes(i)?'Simulated checked':'Not verified')+'</small></span></label>').join('')+'</div>';
 }
 function inspector(state,r,role){
- const next=nextStatus(r),allowed=hasRole(r.module,role,r);
+ const next=nextStatus(r);
+ const conflictBlocked=r.module==='priest_schedule'&&r.status==='Proposed'&&getRecords(state,'priest_schedule').some(x=>x.id!==r.id&&x.owner===r.owner&&x.status==='Conflict'&&x.date.split(' · ')[0]===r.date.split(' · ')[0]);
+ const allowed=hasRole(r.module,role,r)&&!conflictBlocked;
  const mod=INDEX[r.module];
  const intentionPicker=r.module==='intentions'&&r.status==='Requested'
  ?'<label class="sys-action-field">Choose fictional celebrant<select data-sys-celebrant="'+esc(r.id)+'"><option value="">Choose a priest</option><option value="Sample Priest A">Sample Priest A</option><option value="Sample Priest B">Sample Priest B</option></select></label>':'';
@@ -102,7 +113,7 @@ function inspector(state,r,role){
  '<div class="sys-inspect-scroll"><div class="sys-info-list"><div class="sys-info"><dt>Accountable owner</dt><dd>'+esc(r.owner)+'</dd></div><div class="sys-info"><dt>Schedule / due</dt><dd>'+esc(r.date)+'</dd></div><div class="sys-info"><dt>Category</dt><dd>'+esc(r.tag)+'</dd></div>'+infoRows(r)+'</div>'+
  checklist(state,r)+
  '<div class="sys-inspect-group"><h4>Custody / action history <span>'+r.timeline.length+'</span></h4><ol class="sys-timeline">'+r.timeline.slice().reverse().map(e=>'<li><b>'+esc(e.event)+'</b><span>'+esc(e.actor)+' · '+esc(e.at)+'</span><small>'+esc(e.note)+'</small></li>').join('')+'</ol></div></div>'+
- '<div class="sys-inspect-footer">'+(next?'<p><b>Next action:</b> '+esc(next)+'</p>'+intentionPicker+depositPicker+'<button type="button" data-sys-next="'+esc(r.id)+'" class="sys-btn solid" '+(!allowed?'disabled aria-label="Switch to an authorized demo role to proceed"':'')+'>'+esc(actionLabel(r.module,next))+' →</button>'+(!allowed?'<small>Switch to an authorized role in the top bar. These are simulated permissions, not real access control.</small>':''):'<p>Sample workflow is complete or awaits policy-specific action.</p><button class="sys-btn light" type="button" data-sys-report="'+esc(r.id)+'">Print sample case summary</button>')+'</div></aside>';
+ '<div class="sys-inspect-footer">'+(next?'<p><b>Next action:</b> '+esc(next)+'</p>'+intentionPicker+depositPicker+'<button type="button" data-sys-next="'+esc(r.id)+'" class="sys-btn solid" '+(!allowed?'disabled aria-label="Switch to an authorized demo role to proceed"':'')+'>'+esc(actionLabel(r.module,next))+' →</button>'+(!allowed?'<small>'+(conflictBlocked?'Overlapping availability detected. Office coverage must be resolved first.':'Switch to an authorized role in the top bar. These are simulated permissions, not real access control.')+'</small>':''):'<p>Sample workflow is complete or awaits policy-specific action.</p><button class="sys-btn light" type="button" data-sys-report="'+esc(r.id)+'">Print sample case summary</button>')+'</div></aside>';
 }
 function moduleDataRows(state,mod){
  const rows=filterRecords(state,mod);

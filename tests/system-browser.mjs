@@ -29,6 +29,7 @@ try{
  await page.emulateMedia({reducedMotion:'reduce'});
  assert.match(await page.locator('h1').first().innerText(),/Office command center/);
  assert.ok(await page.locator('#navigation .nav-button').count()>=25);
+ assert.equal(await page.locator('.sys-directory button').count(),22);
  const modules=['registry','certificates','marriage','baptism','intentions','collections','public','funerals','finance','correspondence','catechism','chapels','ministries','announcements','facilities','rectory','diocese','personnel','cemetery','priest_schedule','inbox','workdesk'];
  for(const id of modules)assert.equal(await page.locator('#navigation [data-nav="'+id+'"]').count(),1,'route '+id);
  for(const width of [320,390,768,1024,1440]){
@@ -93,6 +94,9 @@ try{
  await go('priest_schedule');
  await page.locator('[data-sys-open="PS-102"]').click();
  assert.match(await page.locator('.sys-inspector').innerText(),/Accepted \(demo\)/);
+ await page.locator('[data-sys-open="PS-103"]').click();
+ assert.equal(await page.locator('[data-sys-next="PS-103"]').isDisabled(),true);
+ assert.match(await page.locator('.sys-inspector').innerText(),/Overlapping availability detected/);
  await page.screenshot({path:'artifacts/system-browser/priest-scheduling.png',fullPage:true});
  // Public portal connects a fictional request into the secretariat case system.
  await go('public');

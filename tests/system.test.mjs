@@ -91,7 +91,9 @@ test('unsupported roles are denied, completed records have no next transition',(
 });
 test('dashboard and every module render real content and cases without internet or persistence',()=>{
  const s=createShowcaseState(),cases=seedCases();
- assert.match(renderDesk(s,cases),/Office command center/);
+ const dashboard=renderDesk(s,cases);
+ assert.match(dashboard,/Office command center/);
+ assert.equal((dashboard.split('class="sys-directory">')[1]?.split('</div>')[0].match(/<button/g)||[]).length,22);
  for(const m of CATALOG){
   assert.equal(isShowcaseRoute(m.id),true);
   const view=renderShowcase(m.id,s,cases,'administrator');
