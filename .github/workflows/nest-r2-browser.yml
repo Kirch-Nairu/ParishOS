@@ -1,0 +1,39 @@
+name: NEST R2 browser QA
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "index.html"
+      - "app.js"
+      - "styles.css"
+      - "workflow.mjs"
+      - "tests/**"
+      - ".github/workflows/nest-r2-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout candidate
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Static source and Node regression suite
+        run: npm run build
+      - name: Install isolated browser QA dependency
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Real Chromium acceptance
+        run: node tests/browser-qa.mjs
+      - name: Upload screenshots and diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: parishos-r2-chromium-screenshots
+          path: artifacts/browser/
+          if-no-files-found: warn
