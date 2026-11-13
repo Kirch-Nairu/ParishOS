@@ -93,7 +93,7 @@ try{
  for(const name of ['seminarAttested','bannsAttested','reviewAttested'])await page.locator('input[name="'+name+'"]').check();
  await submit();
  await page.locator('input[name="bookingDate"]').fill('2026-12-05');
- await page.locator('select[name="assignedPriest"]').selectOption({label:'Sample Priest A'});
+ await page.locator('select[name="assignedPriest"]').selectOption({label:'Fr. Mateo Cruz'});
  await page.locator('input[name="conflictChecked"]').check();await submit();
  const marriageText=await page.locator('#content').innerText();
  assert.match(marriageText,/Booking confirmed/);

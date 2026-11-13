@@ -64,7 +64,7 @@ try{
  // Mass intention fulfillment separate from financial offering.
  await go('intentions');
  await page.locator('[data-sys-open="MI-2601"]').click();
- await page.locator('[data-sys-celebrant="MI-2601"]').selectOption('Sample Priest A');
+ await page.locator('[data-sys-celebrant="MI-2601"]').selectOption('Fr. Mateo Cruz');
  await next('MI-2601');
  await role('priest');await next('MI-2601');
  const intention=await page.locator('.sys-inspector').innerText();

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light">
-<meta name="description" content="ParishOS fictional rectory-office operations showcase. All data and transactions are demonstrations only.">
-<title>ParishOS · Rectory Office Demo</title>
+<meta name="description" content="ParishOS parish management software concept. Explore records, requests, scheduling and stewardship workflows.">
+<title>ParishOS | Parish Office Management</title>
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./system.css">
 <script type="module" src="./app.js"></script>
@@ -19,17 +19,17 @@
       <div><strong>parish<span>OS</span></strong><small>RECTORY OFFICE</small></div>
       <button class="icon-button sidebar-close" type="button" id="closeMenu" aria-label="Close navigation">×</button>
     </div>
-    <div class="parish-identity"><span class="identity-icon" aria-hidden="true">SG</span><div><strong>St. Gabriel Parish</strong><small>Fictional demonstration</small></div></div>
+    <div class="parish-identity"><span class="identity-icon" aria-hidden="true">SG</span><div><strong>St. Gabriel Parish</strong><small>Parish administration</small></div></div>
     <div class="sidebar-scroll"><nav id="navigation" aria-label="Workspaces"></nav></div>
     <div class="sidebar-bottom"><span class="side-dot"></span> Synthetic records · No sign-in<br><small>Kirjane Information Technology Services</small></div>
   </aside>
   <div class="workspace">
     <header class="topbar">
       <div class="topbar-left"><button class="icon-button menu-button" type="button" id="openMenu" aria-label="Open navigation" aria-expanded="false">☰</button><span class="topbar-root">Office workspace</span><span class="slash">/</span><strong id="crumb">Workdesk</strong></div>
-      <div class="topbar-right"><label class="search-box"><span aria-hidden="true">⌕</span><input id="topSearch" type="search" placeholder="Search case / reference" aria-label="Search fictional cases"><kbd>/</kbd></label><label class="role-picker"><span>Viewing as</span><select id="roleSelect" aria-label="Simulated staff role"></select></label></div>
+      <div class="topbar-right"><label class="search-box"><span aria-hidden="true">⌕</span><input id="topSearch" type="search" placeholder="Search cases or records" aria-label="Search parish office cases"><kbd>/</kbd></label><label class="role-picker"><span>Workspace role</span><select id="roleSelect" aria-label="Preview staff role"></select></label></div>
     </header>
     <main id="main" tabindex="-1">
-      <div class="demo-banner" role="note"><span class="demo-symbol" aria-hidden="true">ⓘ</span><p><strong>PRODUCT CONCEPT · DEMONSTRATION ONLY.</strong> All names, references, dates and transactions are fictional. No data is stored or sent; actions reset when the page reloads.</p><span class="demo-stamp">SAMPLE · INVALID</span></div>
+      <div class="demo-banner" role="note"><span class="demo-symbol" aria-hidden="true">ⓘ</span><p><strong>INTERACTIVE CONCEPT PREVIEW.</strong> Parish, people, dates and amounts are illustrative. Changes stay in this browser and reset on refresh; no official records or transactions are created.</p><span class="demo-stamp">PREVIEW MODE</span></div>
       <div id="content" aria-live="off"></div>
     </main>
   </div>
@@ -37,16 +37,16 @@
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <dialog id="newCaseDialog" aria-labelledby="newCaseTitle">
   <form id="newCaseForm" class="dialog-form">
-    <div class="dialog-header"><div><span class="eyebrow">FRONT DESK / INTAKE</span><h2 id="newCaseTitle">Register a fictional request</h2></div><button type="button" class="icon-button" data-close-dialog aria-label="Close dialog">×</button></div>
-    <p>For this presentation, enter a fictional label only. No real personal data.</p>
+    <div class="dialog-header"><div><span class="eyebrow">FRONT DESK / INTAKE</span><h2 id="newCaseTitle">Register a service request</h2></div><button type="button" class="icon-button" data-close-dialog aria-label="Close dialog">×</button></div>
+    <p>Enter an example requester name to explore the intake process. Do not enter real personal information.</p>
     <label>Case type<select name="kind" required><option value="certificate">Certificate request</option><option value="correspondence">Incoming correspondence</option><option value="marriage">Marriage preparation file</option></select></label>
-    <label>Fictional subject / label<input name="subject" required maxlength="70" placeholder="e.g. Sample Applicant Z" autocomplete="off"></label>
+    <label>Requester / household<input name="subject" required maxlength="70" placeholder="e.g. Ana Reyes" autocomplete="off"></label>
     <div class="dialog-actions"><button type="button" class="button ghost" data-close-dialog>Cancel</button><button class="button primary" type="submit">Add to office queue</button></div>
   </form>
 </dialog>
 <dialog id="printDialog" aria-labelledby="printTitle">
   <div class="print-content" id="printContent"></div>
-  <div class="dialog-actions no-print"><button class="button ghost" type="button" data-close-dialog>Close</button><button class="button primary" type="button" id="printButton">Print sample</button></div>
+  <div class="dialog-actions no-print"><button class="button ghost" type="button" data-close-dialog>Close</button><button class="button primary" type="button" id="printButton">Print preview</button></div>
 </dialog>
 </body>
 </html>
