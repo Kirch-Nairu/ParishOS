@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile,mkdir} from 'node:fs/promises';
-import {resolve,extname} from 'node:path';
+import {resolve,extname,sep} from 'node:path';
 import {chromium} from 'playwright';
 
 const root=resolve(process.cwd(),'dist');
@@ -9,7 +9,7 @@ const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript'
 const server=createServer(async(req,res)=>{
  const target=(req.url||'/').split('?')[0];
  const file=resolve(root,target==='/'?'index.html':target.replace(/^\/+/,''));
- if(!file.startsWith(root+'/')){res.writeHead(403);res.end();return;}
+ if(!file.startsWith(root+sep)&&!file.startsWith(root+'/')){res.writeHead(403);res.end();return;}
  try{const bytes=await readFile(file);res.writeHead(200,{'Content-Type':mime[extname(file)]||'text/plain'});res.end(bytes);}
  catch{res.writeHead(404);res.end('Not found');}
 });
@@ -37,6 +37,24 @@ try{
   await page.waitForTimeout(260);
   const size=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:window.innerWidth}));
   assert.ok(size.document<=width+1,'dashboard overflow '+width+': '+JSON.stringify(size));
+  if(width===320){
+   const m=await page.evaluate(()=>{
+    const crumb=document.querySelector('#crumb');
+    const roleEl=document.querySelector('#roleSelect');
+    const dirTitle=document.querySelector('.sys-directory button strong');
+    return {
+     crumbText:crumb?.textContent?.trim(),
+     crumbScroll:crumb?.scrollWidth||0,
+     crumbClient:crumb?.clientWidth||0,
+     roleWidth:roleEl?.getBoundingClientRect().width||0,
+     dirFont:dirTitle?parseFloat(getComputedStyle(dirTitle).fontSize):0
+    };
+   });
+   assert.equal(m.crumbText,'Office command center');
+   assert.ok(m.crumbScroll<=m.crumbClient+1,'320px crumb truncated: '+JSON.stringify(m));
+   assert.ok(m.roleWidth>=120,'320px roleSelect too narrow: '+JSON.stringify(m));
+   assert.ok(m.dirFont>=12,'320px directory title font too small: '+JSON.stringify(m));
+  }
   await page.screenshot({path:'artifacts/system-browser/workdesk-'+width+'.png',fullPage:true});
  }
  await page.setViewportSize({width:1440,height:980});
@@ -125,6 +143,25 @@ try{
   await page.setViewportSize({width,height:920});await page.waitForTimeout(260);
   const size=await page.evaluate(()=>({document:document.documentElement.scrollWidth,viewport:window.innerWidth}));
   assert.ok(size.document<=width+1,'module overflow '+width+': '+JSON.stringify(size));
+  if(width===320){
+   const r=await page.evaluate(()=>{
+    const title=document.querySelector('.sys-record-main > strong');
+    const sub=document.querySelector('.sys-record-main > small');
+    const badge=document.querySelector('.sys-record .sys-badge');
+    return {
+     titleWrap:title?getComputedStyle(title).whiteSpace:'',
+     titleFont:title?parseFloat(getComputedStyle(title).fontSize):0,
+     subWrap:sub?getComputedStyle(sub).whiteSpace:'',
+     subFont:sub?parseFloat(getComputedStyle(sub).fontSize):0,
+     badgeFont:badge?parseFloat(getComputedStyle(badge).fontSize):0
+    };
+   });
+   assert.equal(r.titleWrap,'normal','320px record title must wrap: '+JSON.stringify(r));
+   assert.ok(r.titleFont>=11,'320px record title font too small: '+JSON.stringify(r));
+   assert.equal(r.subWrap,'normal','320px record subtitle must wrap: '+JSON.stringify(r));
+   assert.ok(r.subFont>=11,'320px record subtitle font too small: '+JSON.stringify(r));
+   assert.ok(r.badgeFont>=10,'320px record badge font too small: '+JSON.stringify(r));
+  }
   await page.screenshot({path:'artifacts/system-browser/registry-'+width+'.png',fullPage:true});
  }
  assert.deepEqual(errors,[]);

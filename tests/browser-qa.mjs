@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFile, mkdir} from 'node:fs/promises';
-import {resolve, extname} from 'node:path';
+import {resolve, extname, sep} from 'node:path';
 import {chromium} from 'playwright';
 
 const root=resolve(process.cwd(),'dist');
@@ -10,7 +10,7 @@ const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript'
 const server=createServer(async(req,res)=>{
  const target=(req.url||'/').split('?')[0];
  const filename=resolve(root,target==='/'?'index.html':target.replace(/^\/+/,''));
- if(!filename.startsWith(root+'/')){res.writeHead(403);res.end('Forbidden');return;}
+ if(!filename.startsWith(root+sep)&&!filename.startsWith(root+'/')){res.writeHead(403);res.end('Forbidden');return;}
  try{const bytes=await readFile(filename);res.writeHead(200,{'content-type':mime[extname(filename)]||'application/octet-stream'});res.end(bytes);}
  catch{res.writeHead(404);res.end('Not found');}
 });
