@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="ParishOS is a fictional, interactive parish office workspace showcase. No live parish records or services.">
+  <title>ParishOS — Parish Office Workspace (Demo)</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <div id="backdrop" class="sidebar-backdrop" hidden></div>
+    <aside id="sidebar" class="sidebar" aria-label="Primary navigation">
+      <div class="brand-row">
+        <div class="brand-mark" aria-hidden="true"><span class="brand-cross">✦</span></div>
+        <div><div class="brand-name">parish<span>OS</span></div><div class="brand-caption">OFFICE WORKSPACE</div></div>
+        <button class="icon-button sidebar-close" id="closeSidebar" aria-label="Close navigation"><span data-icon="x"></span></button>
+      </div>
+      <div class="parish-card">
+        <span class="parish-avatar" aria-hidden="true"><span data-icon="church"></span></span>
+        <span><strong>St. Gabriel Parish</strong><small>Fictional demo parish</small></span>
+        <span class="parish-caret" data-icon="chevrons-up-down"></span>
+      </div>
+      <div class="sidebar-section-label">WORKSPACE</div>
+      <nav class="nav-stack" id="navPrimary">
+        <button class="nav-item is-active" data-nav="overview" aria-current="page"><span data-icon="layout-dashboard"></span><span>Overview</span></button>
+        <button class="nav-item" data-nav="requests"><span data-icon="inbox"></span><span>Service requests</span><span class="nav-badge" id="requestNavCount">6</span></button>
+        <button class="nav-item" data-nav="records"><span data-icon="book-open"></span><span>Sacramental records</span></button>
+        <button class="nav-item" data-nav="calendar"><span data-icon="calendar-days"></span><span>Parish calendar</span></button>
+        <button class="nav-item" data-nav="intentions"><span data-icon="heart-handshake"></span><span>Mass intentions</span></button>
+        <button class="nav-item" data-nav="documents"><span data-icon="file-badge"></span><span>Certificates & files</span></button>
+      </nav>
+      <div class="sidebar-section-label second">ADMINISTRATION</div>
+      <nav class="nav-stack" id="navSecondary">
+        <button class="nav-item" data-nav="finance"><span data-icon="wallet"></span><span>Finance overview</span></button>
+        <button class="nav-item" data-nav="ministries"><span data-icon="users"></span><span>Ministries & BECs</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-help">
+        <div class="help-icon"><span data-icon="shield-check"></span></div>
+        <strong>Designed for careful custody.</strong>
+        <p>Records, approvals and offerings each have their own workflow.</p>
+        <span class="help-link">A showcase, not a live system <span data-icon="arrow-up-right"></span></span>
+      </div>
+      <div class="sidebar-profile"><div class="profile-avatar">PO</div><span><strong>Parish Office</strong><small>Demo operator · No sign-in</small></span><span data-icon="more-horizontal"></span></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="menuToggle" class="icon-button mobile-menu" aria-label="Open navigation" aria-expanded="false"><span data-icon="menu"></span></button>
+          <span class="breadcrumb-root">Workspace</span><span class="breadcrumb-slash">/</span><span class="breadcrumb-current" id="breadcrumb">Overview</span>
+        </div>
+        <div class="topbar-right">
+          <label class="top-search"><span data-icon="search"></span><input id="globalSearch" type="search" placeholder="Search demo requests..." aria-label="Search demo requests"><kbd>/</kbd></label>
+          <span class="today-label" id="currentDate"></span>
+          <button id="notificationsButton" class="icon-button notification-button" aria-label="Show demo notifications"><span data-icon="bell"></span><i></i></button>
+        </div>
+      </header>
+
+      <main id="mainContent" tabindex="-1">
+        <div class="demo-banner"><span data-icon="info"></span><span><strong>Interactive concept demo.</strong> All parish details, registers and transactions are fictional. Nothing is saved or submitted.</span><span class="demo-pill">SHOWCASE</span></div>
+
+        <section class="view is-visible" id="view-overview" aria-labelledby="overviewTitle">
+          <div class="page-heading overview-heading">
+            <div><span class="eyebrow"><span class="eyebrow-dot"></span> PARISH SECRETARIAT / DAILY OVERVIEW</span><h1 id="overviewTitle">Good morning, <span>Parish Office.</span></h1><p>One calm place for the people, records, and responsibilities behind parish life.</p></div>
+            <button class="button button-primary" data-open-request><span data-icon="plus"></span> New request</button>
+          </div>
+          <div class="stat-grid">
+            <article class="stat-card"><div class="stat-card-top"><span class="stat-label">Open requests</span><span class="stat-icon mint"><span data-icon="inbox"></span></span></div><div class="stat-num" id="statOpen">6</div><div class="stat-foot"><span class="stat-detail">Demo service queue</span><span data-icon="arrow-up-right"></span></div></article>
+            <article class="stat-card"><div class="stat-card-top"><span class="stat-label">Certificates pending</span><span class="stat-icon peach"><span data-icon="file-check"></span></span></div><div class="stat-num" id="statCerts">2</div><div class="stat-foot"><span class="stat-detail">Verification & release</span><span data-icon="arrow-up-right"></span></div></article>
+            <article class="stat-card"><div class="stat-card-top"><span class="stat-label">Mass intentions</span><span class="stat-icon lavender"><span data-icon="hand-heart"></span></span></div><div class="stat-num" id="statIntentions">3</div><div class="stat-foot"><span class="stat-detail">Fulfillment tracked separately</span><span data-icon="arrow-up-right"></span></div></article>
+            <article class="stat-card"><div class="stat-card-top"><span class="stat-label">Upcoming ceremonies</span><span class="stat-icon butter"><span data-icon="calendar-check"></span></span></div><div class="stat-num">2</div><div class="stat-foot"><span class="stat-detail">Illustrative schedule</span><span data-icon="arrow-up-right"></span></div></article>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="panel requests-panel">
+              <div class="panel-header"><div><span class="panel-eyebrow">FRONT DESK</span><h2>Recent service requests</h2><p>Follow each request from intake to authorized release.</p></div><button class="text-link" data-go="requests">View all <span data-icon="arrow-up-right"></span></button></div>
+              <div class="chip-row" role="group" aria-label="Filter recent service requests"><button class="chip is-selected" data-filter="All" aria-pressed="true">All requests</button><button class="chip" data-filter="For review" aria-pressed="false">For review</button><button class="chip" data-filter="In progress" aria-pressed="false">In progress</button><button class="chip" data-filter="Ready" aria-pressed="false">Ready</button></div>
+              <div class="table-wrap"><table class="data-table"><thead><tr><th>REQUEST / PERSON</th><th>SERVICE</th><th>STATUS</th><th class="right-cell">ACTION</th></tr></thead><tbody id="overviewRequestRows"></tbody></table></div>
+              <div class="panel-footer"><span data-icon="lock-keyhole"></span><span>Request details in this prototype are sample-only.</span></div>
+            </article>
+            <div class="right-stack">
+              <article class="panel schedule-panel">
+                <div class="panel-header compact"><div><span class="panel-eyebrow">SCHEDULE</span><h2>Coming up</h2></div><button class="round-link" data-go="calendar" aria-label="Open parish calendar"><span data-icon="arrow-up-right"></span></button></div>
+                <div class="schedule-list">
+                  <div class="schedule-item"><div class="schedule-time"><strong>09:00</strong><small>AM</small></div><div class="schedule-rail mint-rail"></div><div class="schedule-copy"><strong>Baptism preparation</strong><span>Formation room · Demo</span></div></div>
+                  <div class="schedule-item"><div class="schedule-time"><strong>11:30</strong><small>AM</small></div><div class="schedule-rail gold-rail"></div><div class="schedule-copy"><strong>Marriage file review</strong><span>Secretariat office · Demo</span></div></div>
+                  <div class="schedule-item"><div class="schedule-time"><strong>03:00</strong><small>PM</small></div><div class="schedule-rail violet-rail"></div><div class="schedule-copy"><strong>Parish ministry meeting</strong><span>Pastoral hall · Demo</span></div></div>
+                </div>
+                <button class="schedule-link" data-go="calendar">Open calendar <span data-icon="arrow-right"></span></button>
+              </article>
+              <article class="note-panel"><div class="note-header"><span data-icon="sparkles"></span> AT THE HEART OF THE OFFICE</div><h3>Every document has a story. Every request deserves care.</h3><p>Designed around real parish workflows—without turning sacred records into ordinary transactions.</p><div class="note-ornament" aria-hidden="true">✳</div></article>
+            </div>
+          </div>
+          <div class="lower-grid">
+            <article class="panel quick-panel"><div class="panel-header compact"><div><span class="panel-eyebrow">YOUR DESK</span><h2>Quick actions</h2></div></div><div class="quick-grid">
+              <button class="quick-action" data-open-request><span class="quick-icon"><span data-icon="clipboard-plus"></span></span><span><strong>Log a request</strong><small>Start a service case</small></span><span data-icon="arrow-up-right"></span></button>
+              <button class="quick-action" data-go="records"><span class="quick-icon gold"><span data-icon="book-open"></span></span><span><strong>Find a register</strong><small>Demo record index</small></span><span data-icon="arrow-up-right"></span></button>
+              <button class="quick-action" data-go="documents"><span class="quick-icon violet"><span data-icon="file-text"></span></span><span><strong>Preview certificate</strong><small>Watermarked sample</small></span><span data-icon="arrow-up-right"></span></button>
+              <button class="quick-action" data-go="intentions"><span class="quick-icon blue"><span data-icon="heart-handshake"></span></span><span><strong>Mass intention book</strong><small>Track fulfillment</small></span><span data-icon="arrow-up-right"></span></button>
+            </div></article>
+            <article class="panel intention-panel"><div class="panel-header compact"><div><span class="panel-eyebrow">LITURGICAL CUSTODY</span><h2>Intention follow-through</h2></div><button class="text-link" data-go="intentions">Open book <span data-icon="arrow-up-right"></span></button></div><div id="overviewIntentions"></div><p class="inline-explainer"><span data-icon="info"></span> An offering is not proof that the Mass was celebrated.</p></article>
+          </div>
+        </section>
+
+        <section class="view" id="view-requests" aria-labelledby="requestsTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> SECRETARIAT / SERVICE DESK</span><h1 id="requestsTitle">Service requests</h1><p>Track inquiries, document requests, ceremonies, and next steps.</p></div><button class="button button-primary" data-open-request><span data-icon="plus"></span> New request</button></div>
+          <div class="panel full-panel"><div class="panel-header"><div><span class="panel-eyebrow">ILLUSTRATIVE QUEUE</span><h2>All demo requests</h2></div><label class="inline-search"><span data-icon="search"></span><input id="requestSearch" type="search" aria-label="Filter service requests" placeholder="Filter by name, ID, service..."></label></div><div class="table-wrap"><table class="data-table"><thead><tr><th>REQUEST / PERSON</th><th>TYPE</th><th>DATE</th><th>STATUS</th><th class="right-cell">ACTION</th></tr></thead><tbody id="allRequestRows"></tbody></table></div><div class="panel-footer">Actions change only the temporary demonstration interface. No personal data is saved.</div></div>
+        </section>
+
+        <section class="view" id="view-records" aria-labelledby="recordsTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> RECORDS / HISTORICAL CUSTODY</span><h1 id="recordsTitle">Sacramental records</h1><p>Source registers remain authoritative. This is an illustrative search index, not a sacramental registry.</p></div><span class="page-side-note"><span data-icon="shield-check"></span> Restricted workflow demo</span></div>
+          <div class="module-grid three">
+            <article class="module-tile"><div class="module-icon"><span data-icon="droplets"></span></div><span class="module-kicker">01 / REGISTER</span><h3>Baptism</h3><p>Source reference, sponsor details, and subsequent annotations.</p><span class="module-bottom">Demo index <span data-icon="arrow-up-right"></span></span></article>
+            <article class="module-tile"><div class="module-icon amber"><span data-icon="scroll-text"></span></div><span class="module-kicker">02 / REGISTER</span><h3>Confirmation</h3><p>Record linkage and notification to the baptismal parish.</p><span class="module-bottom">Demo index <span data-icon="arrow-up-right"></span></span></article>
+            <article class="module-tile"><div class="module-icon lilac"><span data-icon="rings"></span></div><span class="module-kicker">03 / REGISTER</span><h3>Marriage</h3><p>Separate ecclesiastical register and civil documentation duties.</p><span class="module-bottom">Demo index <span data-icon="arrow-up-right"></span></span></article>
+          </div>
+          <div class="panel full-panel"><div class="panel-header"><div><span class="panel-eyebrow">SOURCE TRACEABILITY</span><h2>Illustrative register index</h2></div><span class="light-tag">Sample entries only</span></div><div class="table-wrap"><table class="data-table"><thead><tr><th>REFERENCE</th><th>REGISTER TYPE</th><th>ENTRY</th><th>NOTES</th></tr></thead><tbody><tr><td><strong>VOL-02 / P.18 / 004</strong></td><td>Baptism</td><td>Sample Person A</td><td><span class="status pending">Source verification</span></td></tr><tr><td><strong>VOL-01 / P.42 / 011</strong></td><td>Confirmation</td><td>Sample Person B</td><td><span class="status progress">Annotation check</span></td></tr><tr><td><strong>VOL-03 / P.06 / 002</strong></td><td>Marriage</td><td>Sample Case C</td><td><span class="status ready">Sample indexed</span></td></tr></tbody></table></div><div class="panel-footer"><span data-icon="alert-circle"></span> Historical corrections require documented authorization; this demo cannot edit a source register.</div></div>
+        </section>
+
+        <section class="view" id="view-calendar" aria-labelledby="calendarTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> PARISH CALENDAR</span><h1 id="calendarTitle">People, places & celebrations</h1><p>A coordinated view of ceremonies, formation, and priest availability.</p></div><span class="page-side-note"><span data-icon="calendar-days"></span> Sample week</span></div>
+          <div class="panel full-panel calendar-board"><div class="panel-header"><div><span class="panel-eyebrow">PLANNING BOARD</span><h2>Upcoming parish activities</h2></div><span class="light-tag">Illustrative schedule</span></div><div class="event-grid"><article class="event-card"><span class="event-date"><strong>MON</strong><b>16</b></span><div><span class="event-type">FORMATION</span><h3>Baptism preparation</h3><p>9:00 AM · Formation room</p></div></article><article class="event-card"><span class="event-date"><strong>TUE</strong><b>17</b></span><div><span class="event-type gold-text">SECRETARIAT</span><h3>Marriage document review</h3><p>11:30 AM · Parish office</p></div></article><article class="event-card"><span class="event-date"><strong>THU</strong><b>19</b></span><div><span class="event-type purple-text">MINISTRIES</span><h3>BEC coordinator meeting</h3><p>3:00 PM · Pastoral hall</p></div></article><article class="event-card"><span class="event-date"><strong>SAT</strong><b>21</b></span><div><span class="event-type">CEREMONY</span><h3>First Communion</h3><p>10:00 AM · Parish church</p></div></article></div><div class="panel-footer"><span data-icon="info"></span> Dates are examples, not public parish announcements or confirmed bookings.</div></div>
+        </section>
+
+        <section class="view" id="view-intentions" aria-labelledby="intentionsTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> INTENTION REGISTER</span><h1 id="intentionsTitle">Mass intentions</h1><p>Track the requested intention, assignment and celebration independently of any offering.</p></div></div>
+          <div class="panel full-panel"><div class="panel-header"><div><span class="panel-eyebrow">OBLIGATION FOLLOW-THROUGH</span><h2>Demo intention book</h2></div><span class="light-tag">Not a canonical record</span></div><div class="intention-rows" id="intentionRows"></div><div class="panel-footer">Marking a sample as celebrated changes only the current browser session; no liturgical fulfillment is certified.</div></div>
+        </section>
+
+        <section class="view" id="view-documents" aria-labelledby="documentsTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> DOCUMENT CONTROL</span><h1 id="documentsTitle">Certificates & files</h1><p>From source verification to authorization, issuance, and an auditable release.</p></div></div>
+          <div class="document-layout"><article class="panel doc-process"><div class="panel-header"><div><span class="panel-eyebrow">ISSUANCE WORKFLOW</span><h2>A certificate is more than a printout.</h2></div></div><ol class="process-list"><li><span>01</span><div><strong>Receive & identify</strong><p>Check requester identity or representative authorization.</p></div></li><li><span>02</span><div><strong>Verify source register</strong><p>Confirm volume, page, entry and annotations.</p></div></li><li><span>03</span><div><strong>Authorized review</strong><p>Appropriate signatory and seal remain outside the demo.</p></div></li><li><span>04</span><div><strong>Release & log</strong><p>Maintain an issuance record and applicable collection entry.</p></div></li></ol></article><article class="preview-card"><div class="preview-paper"><span class="paper-cross">✳</span><span class="paper-heading">PARISH RECORD SAMPLE</span><h3>Certificate Preview</h3><p>Illustrative layout only</p><div class="paper-rule"></div><span class="paper-line"></span><span class="paper-line short"></span><span class="paper-line"></span><span class="paper-watermark">SAMPLE</span><div class="paper-footer">NOT VALID · NO SIGNATURE · NO SEAL</div></div><button class="button button-outline" id="previewCertificate"><span data-icon="eye"></span> Open watermarked preview</button></article></div>
+        </section>
+
+        <section class="view" id="view-finance" aria-labelledby="financeTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> PARISH TEMPORAL ADMINISTRATION</span><h1 id="financeTitle">Finance overview</h1><p>Keep donations, restricted funds, expenses, and Mass obligations distinct.</p></div></div>
+          <div class="finance-grid"><article class="finance-hero"><span class="panel-eyebrow">ILLUSTRATIVE ACCOUNTABILITY</span><h2>Every peso deserves a clear purpose.</h2><p>Parish administration requires transparent stewardship, not ordinary retail checkout assumptions.</p><span class="finance-illustration" aria-hidden="true">✳</span></article><article class="finance-card"><span class="panel-eyebrow">RECEIPT CLASSIFICATION</span><h3>General donations</h3><p>Unrestricted support recorded with acknowledgment and purpose where applicable.</p><span class="light-tag">Sample category</span></article><article class="finance-card"><span class="panel-eyebrow">DESIGNATED CUSTODY</span><h3>Restricted funds</h3><p>Purpose-specific gifts must not silently become general operating funds.</p><span class="light-tag">Approval-sensitive</span></article><article class="finance-card"><span class="panel-eyebrow">SEPARATE OBLIGATION</span><h3>Mass offerings</h3><p>Link an offering to the intention book; track fulfillment separately.</p><span class="light-tag">Not an ordinary sale</span></article></div>
+        </section>
+
+        <section class="view" id="view-ministries" aria-labelledby="ministriesTitle">
+          <div class="page-heading"><div><span class="eyebrow"><span class="eyebrow-dot"></span> PASTORAL COORDINATION</span><h1 id="ministriesTitle">Ministries & communities</h1><p>Help every ministry coordinate people, events, volunteers and local chapels.</p></div></div>
+          <div class="module-grid three"><article class="module-tile"><div class="module-icon"><span data-icon="users"></span></div><span class="module-kicker">FORMATION</span><h3>Catechetical ministry</h3><p>Candidate enrollment, classes, preparation, and attendance.</p></article><article class="module-tile"><div class="module-icon amber"><span data-icon="map-pin"></span></div><span class="module-kicker">BARANGAY CONNECTION</span><h3>Basic Ecclesial Communities</h3><p>Coordinate local chapel groups and parish programs.</p></article><article class="module-tile"><div class="module-icon lilac"><span data-icon="hand-heart"></span></div><span class="module-kicker">PASTORAL CARE</span><h3>Social action</h3><p>Private assistance referrals and community support.</p></article></div><div class="panel full-panel disclaimer-panel"><span data-icon="shield-check"></span><div><strong>Pastoral privacy matters.</strong><p>This concept does not record confessional content or sensitive pastoral notes. Delegated access would require real parish and diocesan approval.</p></div></div>
+        </section>
+
+        <footer class="workspace-footer"><span>ParishOS / Kirion Forge NEST R1</span><span>Fictional prototype · No real record storage · <a href="https://github.com/Kirch-Nairu/ParishOS" target="_blank" rel="noopener noreferrer">Source repository ↗</a></span></footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="requestDialog" class="dialog" aria-labelledby="dialogTitle">
+    <form id="requestForm" method="dialog" class="dialog-content"><div class="dialog-header"><div><span class="panel-eyebrow">DEMO WORKFLOW</span><h2 id="dialogTitle">New service request</h2></div><button type="button" class="icon-button" data-close-dialog aria-label="Close form"><span data-icon="x"></span></button></div>
+      <p class="dialog-info"><span data-icon="shield-alert"></span> Fictional examples only. Do not enter real personal or sacramental information. No data leaves this page.</p>
+      <label class="form-field">Request label<input id="requestName" type="text" placeholder="e.g. Sample Requester 07" maxlength="50" required autocomplete="off"></label>
+      <label class="form-field">Service type<select id="requestService"><option>Baptismal certificate</option><option>Church wedding inquiry</option><option>Confirmation certificate</option><option>Mass intention</option><option>Pastoral visit</option><option>Parish facility request</option></select></label>
+      <label class="form-field">Purpose / next step<select id="requestPurpose"><option>Verify source and requirements</option><option>Schedule an appointment</option><option>Prepare document for authorized review</option></select></label>
+      <div class="dialog-actions"><button type="button" class="button button-muted" data-close-dialog>Cancel</button><button type="submit" class="button button-primary">Add demo request <span data-icon="arrow-right"></span></button></div>
+    </form>
+  </dialog>
+  <dialog id="certificateDialog" class="dialog certificate-dialog" aria-labelledby="certificateTitle"><div class="dialog-content"><div class="dialog-header"><div><span class="panel-eyebrow">NOT AN OFFICIAL DOCUMENT</span><h2 id="certificateTitle">Watermarked certificate example</h2></div><button type="button" class="icon-button" data-close-dialog aria-label="Close certificate preview"><span data-icon="x"></span></button></div><div class="certificate-example"><span class="certificate-watermark">SAMPLE · INVALID</span><div class="certificate-top">PARISHOS · FICTIONAL PARISH</div><h3>Sample Baptismal Certificate</h3><p>This illustrative document demonstrates visual layout only. It does not certify an event or reproduce a real parish register.</p><dl><dt>Name</dt><dd>Sample Person A</dd><dt>Register reference</dt><dd>VOL-02 / P.18 / ENTRY 004 (fictional)</dd><dt>Issuance</dt><dd>NOT AUTHORIZED</dd></dl><div class="certificate-warning">NO OFFICIAL SEAL • NO SIGNATURE • NOT VALID FOR ANY PURPOSE</div></div><div class="dialog-actions"><button type="button" class="button button-primary" data-close-dialog>Close preview</button></div></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
