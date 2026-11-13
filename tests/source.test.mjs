@@ -23,7 +23,7 @@ test('explicit demo warning and invalid certificate markings', () => {
 test('no backend, payment submission, network call or persistent personal data in runtime code', () => {
   assert.doesNotMatch(js, /\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB/i);
   assert.match(js, /event\.preventDefault\(\)/);
-  assert.match(js, /function safe\(value\)/);
+  assert.match(js, /const safe = function \(value\)/);
   assert.match(js, /replace\(\/\[&<>"'\]\/g/);
 });
 
