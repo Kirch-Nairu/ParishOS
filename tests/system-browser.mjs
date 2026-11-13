@@ -55,13 +55,17 @@ try{
  assert.match(await page.locator('.sys-attention').innerText(),/Baptismal eligibility/);
  await role('secretary');
  await page.screenshot({path:'artifacts/system-browser/baptism-management.png',fullPage:true});
+ await page.locator('[data-sys-next="BAP-026"]').click();
+ assert.match(await page.locator('#toast').innerText(),/Check every sponsor/);
+ for(let i=0;i<3;i++)await page.locator('input[data-sys-check="BAP-026"]').nth(i).check();
  await next('BAP-026');
  assert.match(await page.locator('.sys-inspector').innerText(),/Requirements checked/);
  // Mass intention fulfillment separate from financial offering.
  await go('intentions');
  await page.locator('[data-sys-open="MI-2601"]').click();
+ await page.locator('[data-sys-celebrant="MI-2601"]').selectOption('Sample Priest A');
  await next('MI-2601');
- await next('MI-2601');
+ await role('priest');await next('MI-2601');
  const intention=await page.locator('.sys-inspector').innerText();
  assert.match(intention,/Celebrated \(demo\)/);
  assert.match(intention,/₱100/);
@@ -70,8 +74,12 @@ try{
  await page.locator('[data-sys-open="COL-112"]').click();
  assert.equal(await page.locator('[data-sys-next="COL-112"]').isDisabled(),true);
  await role('finance');
+ await page.locator('[data-sys-next="COL-112"]').click();
+ assert.match(await page.locator('#toast').innerText(),/Collection count and witness/);
+ for(let i=0;i<2;i++)await page.locator('input[data-sys-check="COL-112"]').nth(i).check();
  await next('COL-112');
  assert.match(await page.locator('.sys-inspector').innerText(),/Count verified/);
+ await page.locator('[data-sys-deposit-ref="COL-112"]').fill('SAMPLE-DEP-112');
  await next('COL-112');
  assert.match(await page.locator('.sys-inspector').innerText(),/Deposit matched/);
  await page.screenshot({path:'artifacts/system-browser/collections.png',fullPage:true});

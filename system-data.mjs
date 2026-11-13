@@ -138,6 +138,9 @@ export function transition(record,role,now='13 Nov 2026 · 16:00'){
  if(record.module==='priest_schedule'&&record.status==='Proposed'&&role!=='priest')return {ok:false,error:'Only the selected priest persona can accept this proposed assignment in the demo.'};
  if(record.module==='finance'&&record.status==='For approval'&&role!=='administrator')return {ok:false,error:'A distinct simulated office administrator must review this voucher. The finance clerk cannot self-approve.'};
  if(record.module==='registry'&&next==='Review queued'&&role!=='records')return {ok:false,error:'Only the records desk may queue register annotation review.'};
+ if(record.module==='intentions'&&record.status==='Requested'&&!record.fields.some(f=>f.label==='Assignee'&&/^Sample Priest [AB]$/.test(f.value)))return {ok:false,error:'Assign a fictional celebrant before proceeding.'};
+ if(record.module==='intentions'&&record.status==='Assigned'&&!['priest','administrator'].includes(role))return {ok:false,error:'Mass fulfillment requires separate celebrant/authorized office attestation in this demonstration.'};
+ if(record.module==='collections'&&record.status==='Count verified'&&!record.fields.some(f=>f.label==='Deposit'&&/^Matched \(demo\) · SAMPLE-/i.test(f.value)))return {ok:false,error:'A separate fictional deposit reference is required for reconciliation.'};
  const before=record.status;
  const copy={...record,status:next, timeline:[...record.timeline,{at:now,actor:'Demo '+role,event:'Moved to '+next,note:'Simulated transition: '+before+' → '+next+'. No external or canonical state changed.'}]};
  return {ok:true,record:copy};

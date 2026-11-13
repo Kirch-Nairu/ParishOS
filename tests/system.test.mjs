@@ -47,7 +47,8 @@ test('every data module provides populated fictional work queue and metadata',()
 test('mass intention offering does not change when fulfillment is recorded',()=>{
  let c=createModuleData().find(x=>x.id==='MI-2602');
  const saved=c.fields.find(x=>x.label==='Offering')?.value||'None';
- const result=transition(c,'secretary');
+ assert.equal(transition(c,'secretary').ok,false);
+ const result=transition(c,'priest');
  assert.equal(result.ok,true);
  c=result.record;
  assert.equal(c.status,'Celebrated (demo)');
@@ -73,7 +74,9 @@ test('expense approval needs separate administrator attestation in demo',()=>{
 test('restricted donation remains purpose-bound after status transition',()=>{
  const c=createModuleData().find(x=>x.id==='DON-043');
  const before=c.fields.find(x=>x.label==='Purpose').value;
- const result=transition(c,'finance');
+ assert.equal(transition(c,'finance').ok,false);
+ const updated={...c,fields:c.fields.map(x=>x.label==='Deposit'?{...x,value:'Matched (demo) · SAMPLE-DEP-043'}:x)};
+ const result=transition(updated,'finance');
  assert.equal(result.ok,true);
  assert.equal(result.record.fields.find(x=>x.label==='Purpose').value,before);
  assert.equal(c.status,'Count verified');
@@ -101,9 +104,15 @@ test('dashboard and every module render real content and cases without internet 
 test('record actions preserve visible timeline and reset data on demand',()=>{
  const state=createShowcaseState();
  const seed=state.records.find(r=>r.id==='BAP-026');
+ const denied=onShowcaseClick({dataset:{sysNext:'BAP-026'}},state,'secretary');
+ assert.match(denied.message,/Check every sponsor/);
+ for(let i=0;i<seed.docs.length;i++){
+  const result=onShowcaseClick({dataset:{sysCheck:'BAP-026',sysDoc:String(i)}},state,'secretary');
+  assert.equal(result.refresh,true);
+ }
  const result=onShowcaseClick({dataset:{sysNext:'BAP-026'}},state,'secretary');
  assert.equal(result.refresh,true);
- assert.equal(state.records.find(r=>r.id==='BAP-026').timeline.length,2);
+ assert.equal(state.records.find(r=>r.id==='BAP-026').timeline.length,seed.docs.length+2);
  assert.equal(state.records.find(r=>r.id==='BAP-026').status,'Requirements checked');
  const again=onShowcaseClick({dataset:{sysReset:''}},state,'administrator');
  assert.equal(again.refresh,true);
