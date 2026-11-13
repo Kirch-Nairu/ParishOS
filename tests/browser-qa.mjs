@@ -27,7 +27,7 @@ const submit=async()=>{await page.locator('#actionForm button[type=submit]').cli
 try{
  await gotoDesk();
  await page.emulateMedia({reducedMotion:'reduce'});
- assert.match(await page.locator('h1').first().innerText(),/Rectory office workdesk/);
+ assert.match(await page.locator('h1').first().innerText(),/Office command center/);
  assert.equal(await page.locator('#navigation [data-nav="workdesk"]').getAttribute('aria-current'),'page');
  assert.equal(await page.locator('#navigation [data-nav="priest"]').count(),1);
  // Viewports, screenshots, overflow, navigation at mobile size.
@@ -105,8 +105,8 @@ try{
  await page.locator('#topSearch').fill('NO-MATCH-REF');
  assert.match(await page.locator('#caseRows').innerText(),/No fictional cases match/);
  await page.reload({waitUntil:'networkidle'});
- assert.match(await page.locator('#content').innerText(),/Rectory office workdesk/);
- assert.equal(await page.locator('.kpi').first().innerText().then(t=>t.includes('4')),true);
+ assert.match(await page.locator('#content').innerText(),/Office command center/);
+ assert.equal(await page.locator('.sys-kpi').first().innerText().then(t=>t.includes('4')),true);
  assert.deepEqual(errors,[]);
  console.log('PASS: real Chromium desk, 5 viewport screenshots/no overflow, shortcut/menu, denied role, all 3 case journeys, audit, print preview, reset.');
 }finally{

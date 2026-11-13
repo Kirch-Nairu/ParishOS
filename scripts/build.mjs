@@ -5,6 +5,6 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const dist=resolve(root,'dist');
 await rm(dist,{recursive:true,force:true});
 await mkdir(dist,{recursive:true});
-for(const source of ['index.html','styles.css','app.js','workflow.mjs'])await copyFile(resolve(root,source),resolve(dist,source));
+for(const source of ['index.html','styles.css','system.css','app.js','workflow.mjs','system-data.mjs','system-ui.mjs'])await copyFile(resolve(root,source),resolve(dist,source));
 await writeFile(resolve(dist,'robots.txt'),'User-agent: *\nDisallow: /\n');
 console.log('ParishOS R2 rectory-office demo build complete.');

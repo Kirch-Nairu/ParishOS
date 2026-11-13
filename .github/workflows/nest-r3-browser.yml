@@ -1,0 +1,39 @@
+name: NEST R3 complete parish system showcase browser QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "app.js"
+      - "index.html"
+      - "system.css"
+      - "system-data.mjs"
+      - "system-ui.mjs"
+      - "tests/**"
+      - ".github/workflows/nest-r3-browser.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-system:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Node source and workflow regression / static build
+        run: npm run build
+      - name: Install browser QA dependency only
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund playwright@1.56.1
+      - name: Install Chromium browser
+        run: npx playwright install --with-deps chromium
+      - name: Real integrated 22-module browser walkthrough
+        run: node tests/system-browser.mjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: parishos-r3-system-screenshots
+          path: artifacts/system-browser/
+          if-no-files-found: warn

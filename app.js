@@ -1,8 +1,13 @@
 import {seedCases,advance,nextStep,allowed,toggleDocument,metrics,ROLE_NAMES,FINAL,WORKFLOWS} from './workflow.mjs';
+import {CATALOG} from './system-data.mjs';
+import {createShowcaseState,renderDesk,renderShowcase,isShowcaseRoute,onShowcaseClick,onShowcaseSubmit,updateShowcaseSearch,updateShowcaseFilter,updatePortalSearch,setPortalRef,renderShowcaseTable} from './system-ui.mjs';
 
 const SECTIONS=[
- {group:'OPERATIONS',items:[['workdesk','Workdesk','▦'],['inbox','Office inbox','▤'],['requests','Service requests','▥'],['certificates','Certificates & records','▣'],['correspondence','Correspondence','✉'],['marriage','Marriage cases','◇'],['scheduling','Scheduling','▦'],['archive','Document archive','▧'],['finance','Finance & receipts','₱'],['audit','Activity & audit','◷']]},
- {group:'SECONDARY',items:[['intentions','Mass intentions','✣'],['priest','Priest approvals','✦']]}
+ {group:'OFFICE OPERATIONS',items:[['workdesk','Office command center','▦'],['inbox','Office inbox','▤'],['requests','Service requests','▥'],['correspondence','Correspondence','✉'],['archive','Document archive','▧'],['audit','Activity & audit','◷']]},
+ {group:'SACRAMENTS & RECORDS',items:[['registry','Sacramental registry','◫'],['certificates','Certificate center','▣'],['marriage','Wedding management','◇'],['baptism','Baptism management','◉'],['intentions','Mass intentions','✣'],['funerals','Funerals & sick calls','✚']]},
+ {group:'PASTORAL & SCHEDULING',items:[['priest_schedule','Priest scheduling','◷'],['scheduling','Parish calendar','▦'],['catechism','Catechism & seminars','▤'],['chapels','Barangay chapels / BECs','⌂'],['ministries','Ministry management','♙']]},
+ {group:'FINANCE & ADMIN',items:[['collections','Collections & donations','₱'],['finance','Parish finance','▦'],['facilities','Facilities & inventory','▧'],['rectory','Rectory administration','⌑'],['diocese','Diocesan coordination','⇥'],['personnel','Personnel administration','♧'],['cemetery','Cemetery / columbarium','◇']]},
+ {group:'PUBLIC & COMPANION',items:[['public','Parishioner portal','◎'],['announcements','Announcements','◖'],['priest','Priest companion (mobile)','◉']]}
 ];
 const TYPES={certificate:'Certificate',correspondence:'Correspondence',marriage:'Marriage file'};
 const FIELDS={
@@ -32,6 +37,7 @@ const FIELDS={
 const $=s=>document.querySelector(s);
 const safe=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 let cases=seedCases(),role='administrator',route='workdesk',selectedId=null,query='',filter='All',toastTimer=null,lastFocus=null;
+const showcase=createShowcaseState();
 const displayDate=s=>s?safe(s):'—';
 const tone=s=>/released|archived|confirmed|complete|verified/i.test(s)?'green':/awaiting|missing|received|follow-up/i.test(s)?'amber':'blue';
 function pill(value){return '<span class="pill '+tone(value)+'">'+safe(value)+'</span>';}
@@ -133,7 +139,7 @@ function simpleModule(view){
 }
 function render(){
  nav();$('#crumb').textContent=titleOf(route);document.title=titleOf(route)+' · ParishOS Demo';
- $('#content').innerHTML=route==='workdesk'?dashboard():route==='case'?caseDetail():['inbox','requests','certificates','correspondence','marriage'].includes(route)?queue(route):simpleModule(route);
+ $('#content').innerHTML=route==='workdesk'?renderDesk(showcase,cases):route==='case'?caseDetail():['inbox','requests','certificates','correspondence','marriage'].includes(route)?queue(route):isShowcaseRoute(route)?renderShowcase(route,showcase,cases,role):simpleModule(route);
  const f=$('#queueFilter');if(f)f.value=filter;
 }
 function showModal(id){lastFocus=document.activeElement;$('#'+id).showModal();const input=$('#'+id).querySelector('input:not([type="hidden"]),select,button');if(input)input.focus();}
@@ -143,13 +149,13 @@ function preview(id){
  $('#printContent').innerHTML='<div class="print-sheet"><div class="invalid-watermark">SAMPLE · INVALID</div><span class="eyebrow">PARISHOS / INTERNAL SHOWCASE</span><h2 id="printTitle">Fictional certificate preview</h2><p><strong>Subject:</strong> '+safe(c.subject)+'</p><p><strong>Record source:</strong> '+safe(c.sourceRef)+'</p><p><strong>Case reference:</strong> '+safe(c.id)+'</p><p><strong>Status:</strong> '+safe(c.status)+'</p><div class="paper-notice">NO OFFICIAL SEAL · NO SIGNATURE · NOT VALID FOR ANY CIVIL OR ECCLESIASTICAL PURPOSE</div></div>';
  showModal('printDialog');
 }
-function addNew(kind,subject){
+function addNew(kind,subject,stayOnPortal=false){
  const base=seedCases().find(x=>x.kind===kind),copy=JSON.parse(JSON.stringify(base));
  if(!copy)return;
  const num=cases.length+1;copy.id=(kind==='certificate'?'CERT':kind==='marriage'?'MAR':'COR')+'-D'+String(num).padStart(3,'0');
  copy.subject=subject;copy.received='2026-11-13';copy.sourceRef='SYNTHETIC / NO SOURCE ENTRY';
  copy.history=[{id:copy.id+'-1',what:'Fictional intake created',at:now(),by:ROLE_NAMES[role],reference:copy.id,note:'No data submitted to a server.',from:'',to:''}];
- cases.unshift(copy);go('case',copy.id);notice(copy.id+' created temporarily. Reload to reset.');
+ cases.unshift(copy);if(stayOnPortal){setPortalRef(showcase,copy.id);render();}else{go('case',copy.id);}notice(copy.id+' created temporarily. Reload to reset.');return copy.id;
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('button');if(!b)return;
@@ -158,8 +164,34 @@ document.addEventListener('click',e=>{
  if(b.dataset.new!==undefined){showModal('newCaseDialog');return;}
  if(b.dataset.preview){preview(b.dataset.preview);return;}
  if(b.dataset.closeDialog!==undefined){hideModal(b.closest('dialog'));return;}
+ if(Object.keys(b.dataset).some(k=>k.startsWith('sys'))){
+  if(b.dataset.sysReset!==undefined)cases=seedCases();
+  const result=onShowcaseClick(b,showcase,role);
+  if(!result)return;
+  if(result.closeModal){hideModal(b.closest('dialog'));return;}
+  if(result.openModal){showModal(result.openModal);return;}
+  if(result.portalService){
+   const s=$('#publicService');if(s)s.value=result.portalService;
+   $('#publicRequestForm')?.scrollIntoView({behavior:'smooth',block:'start'});return;
+  }
+  if(result.printHtml){
+   $('#printContent').innerHTML=result.printHtml;showModal('printDialog');return;
+  }
+  if(result.refresh)render();
+  if(result.message)notice(result.message);
+ }
 });
 document.addEventListener('submit',e=>{
+ if(e.target.id==='publicForm'||e.target.id==='systemNewForm'){
+   e.preventDefault();
+   const result=onShowcaseSubmit(e.target,showcase,role);
+   if(!result)return;
+   if(result.portalCase){addNew(result.portalCase.kind,result.portalCase.subject,true);return;}
+   if(result.closeModal){hideModal(e.target.closest('dialog'));}
+   if(result.refresh)render();
+   if(result.message)notice(result.message);
+   return;
+ }
  if(e.target.id==='newCaseForm'){
   e.preventDefault();const data=new FormData(e.target),subject=String(data.get('subject')||'').trim();if(!subject)return;
   const kind=String(data.get('kind'));hideModal($('#newCaseDialog'));e.target.reset();addNew(kind,subject);return;
@@ -174,6 +206,18 @@ document.addEventListener('submit',e=>{
  }
 });
 document.addEventListener('change',e=>{
+ if(e.target.dataset.sysCheck!==undefined){
+   const result=onShowcaseClick(e.target,showcase,role);
+   if(result?.refresh)render();if(result?.message)notice(result.message);return;
+ }
+ if(e.target.dataset.sysFilter!==undefined){
+   updateShowcaseFilter(showcase,e.target.dataset.sysFilter,e.target.value);
+   const list=$('#sysResults');if(list)list.innerHTML=renderShowcaseTable(showcase,e.target.dataset.sysFilter);
+   return;
+ }
+ if(e.target.dataset.sysPortalSearch!==undefined){
+   updatePortalSearch(showcase,e.target.value);render();return;
+ }
  if(e.target.id==='roleSelect'){role=e.target.value;render();notice('Role switched to '+ROLE_NAMES[role]+'. Permissions are UI-only simulation.');}
  if(e.target.id==='queueFilter'){filter=e.target.value;const type=route==='certificates'?'certificate':route==='correspondence'?'correspondence':route==='marriage'?'marriage':null;$('#caseRows').innerHTML=tableRows(filtered(type));}
  if(e.target.dataset.doc){
@@ -182,6 +226,12 @@ document.addEventListener('change',e=>{
   if(!update.ok){notice(update.error);render();return;}
   cases=cases.map(x=>x.id===c.id?update.item:x);
   render();notice('Checklist updated in memory. Source evidence remains fictional.');
+ }
+});
+document.addEventListener('input',e=>{
+ if(e.target.dataset.sysSearch!==undefined){
+   updateShowcaseSearch(showcase,e.target.dataset.sysSearch,e.target.value);
+   const list=$('#sysResults');if(list)list.innerHTML=renderShowcaseTable(showcase,e.target.dataset.sysSearch);
  }
 });
 $('#topSearch').addEventListener('input',e=>{
