@@ -84,7 +84,6 @@ try{
  await page.locator('input[name="docsVerified"]').check();await submit();
  assert.match(await page.locator('#toast').innerText(),/Every required document/);
  for(const d of ['Confirmation certificates','CENOMAR','Pre-Cana record']){
-  await page.locator('.doc-check input').filter({has:undefined}).count(); // keep queries current after rerenders
   await page.locator('.doc-check input[data-doc="'+d+'"]').check();
  }
  await page.locator('input[name="docsVerified"]').check();await submit();
