@@ -92,13 +92,13 @@ test('unsupported roles are denied, completed records have no next transition',(
 test('dashboard and every module render real content and cases without internet or persistence',()=>{
  const s=createShowcaseState(),cases=seedCases();
  const dashboard=renderDesk(s,cases);
- assert.match(dashboard,/Office command center/);
+ assert.match(dashboard,/Parish office dashboard/);
  assert.equal((dashboard.split('class="sys-directory">')[1]?.split('</div>')[0].match(/<button/g)||[]).length,22);
  for(const m of CATALOG){
   assert.equal(isShowcaseRoute(m.id),true);
   const view=renderShowcase(m.id,s,cases,'administrator');
   assert.ok(view.length>800,'rendered '+m.id);
-  assert.match(view,/DEMO|demo|fictional|sample|Sample/);
+  assert.match(view,/(sys-module-intro|sys-portal|sys-priest-wrap)/);
  }
  for(const script of [js,readFileSync(new URL('../system-ui.mjs',import.meta.url),'utf8'),readFileSync(new URL('../system-data.mjs',import.meta.url),'utf8')])
   assert.doesNotMatch(script,/\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB/i);

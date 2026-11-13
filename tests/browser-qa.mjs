@@ -27,7 +27,7 @@ const submit=async()=>{await page.locator('#actionForm button[type=submit]').cli
 try{
  await gotoDesk();
  await page.emulateMedia({reducedMotion:'reduce'});
- assert.match(await page.locator('h1').first().innerText(),/Office command center/);
+ assert.match(await page.locator('h1').first().innerText(),/Parish office dashboard/);
  assert.equal(await page.locator('#navigation [data-nav="workdesk"]').getAttribute('aria-current'),'page');
  assert.equal(await page.locator('#navigation [data-nav="priest"]').count(),1);
  // Viewports, screenshots, overflow, navigation at mobile size.
@@ -50,7 +50,7 @@ try{
  // Role affordances are UI-only simulation.
  await page.locator('[data-open="CERT-0142"]').first().click();
  await page.locator('#roleSelect').selectOption('finance');
- assert.match(await page.locator('#content').innerText(),/another demo role/);
+ assert.match(await page.locator('#content').innerText(),/responsible staff role/);
  assert.equal(await page.locator('#actionForm').count(),0);
  await page.locator('#roleSelect').selectOption('administrator');
  // Certificate: verify -> source -> draft -> authorization queue -> fictional release.
@@ -61,7 +61,7 @@ try{
  await page.locator('input[name="approvalAttested"]').check();await submit();
  assert.match(await page.locator('.case-heading').innerText(),/Ready for release/);
  await page.locator('input[name="recipientChecked"]').check();await submit();
- assert.match(await page.locator('.case-heading').innerText(),/Demo released/);
+ assert.match(await page.locator('.case-heading').innerText(),/Released/);
  assert.equal(await page.locator('.timeline li').count(),7);
  await page.locator('[data-preview="CERT-0142"]').click();
  assert.match(await page.locator('#printDialog').innerText(),/SAMPLE · INVALID/);
@@ -103,9 +103,9 @@ try{
  // Findability, empty state and in-memory reset on reload.
  await page.locator('#navigation [data-nav="inbox"]').click();
  await page.locator('#topSearch').fill('NO-MATCH-REF');
- assert.match(await page.locator('#caseRows').innerText(),/No fictional cases match/);
+ assert.match(await page.locator('#caseRows').innerText(),/No matching cases/);
  await page.reload({waitUntil:'networkidle'});
- assert.match(await page.locator('#content').innerText(),/Office command center/);
+ assert.match(await page.locator('#content').innerText(),/Parish office dashboard/);
  assert.equal(await page.locator('.sys-kpi').first().innerText().then(t=>t.includes('4')),true);
  assert.deepEqual(errors,[]);
  console.log('PASS: real Chromium desk, 5 viewport screenshots/no overflow, shortcut/menu, denied role, all 3 case journeys, audit, print preview, reset.');

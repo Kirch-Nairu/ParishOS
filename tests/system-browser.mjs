@@ -27,7 +27,7 @@ const next=async(id)=>{await page.locator('[data-sys-next="'+id+'"]').click();};
 try{
  await page.goto(url,{waitUntil:'networkidle'});
  await page.emulateMedia({reducedMotion:'reduce'});
- assert.match(await page.locator('h1').first().innerText(),/Office command center/);
+ assert.match(await page.locator('h1').first().innerText(),/Parish office dashboard/);
  assert.ok(await page.locator('#navigation .nav-button').count()>=25);
  assert.equal(await page.locator('.sys-directory button').count(),22);
  const modules=['registry','certificates','marriage','baptism','intentions','collections','public','funerals','finance','correspondence','catechism','chapels','ministries','announcements','facilities','rectory','diocese','personnel','cemetery','priest_schedule','inbox','workdesk'];
@@ -68,7 +68,7 @@ try{
  await next('MI-2601');
  await role('priest');await next('MI-2601');
  const intention=await page.locator('.sys-inspector').innerText();
- assert.match(intention,/Celebrated \(demo\)/);
+ assert.match(intention,/Celebrated/);
  assert.match(intention,/₱100/);
  // Collection custody, wrong-role prevention, restricted fund display.
  await go('collections');
@@ -93,7 +93,7 @@ try{
  await page.locator('[data-sys-phone-accept="PS-102"]').click();
  await go('priest_schedule');
  await page.locator('[data-sys-open="PS-102"]').click();
- assert.match(await page.locator('.sys-inspector').innerText(),/Accepted \(demo\)/);
+ assert.match(await page.locator('.sys-inspector').innerText(),/Accepted/);
  await page.locator('[data-sys-open="PS-103"]').click();
  assert.equal(await page.locator('[data-sys-next="PS-103"]').isDisabled(),true);
  assert.match(await page.locator('.sys-inspector').innerText(),/Overlapping availability detected/);
