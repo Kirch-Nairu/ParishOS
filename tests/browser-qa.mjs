@@ -26,13 +26,14 @@ const gotoDesk=async()=>{await page.goto('http://127.0.0.1:'+port+'/',{waitUntil
 const submit=async()=>{await page.locator('#actionForm button[type=submit]').click();};
 try{
  await gotoDesk();
+ await page.emulateMedia({reducedMotion:'reduce'});
  assert.match(await page.locator('h1').first().innerText(),/Rectory office workdesk/);
  assert.equal(await page.locator('#navigation [data-nav="workdesk"]').getAttribute('aria-current'),'page');
  assert.equal(await page.locator('#navigation [data-nav="priest"]').count(),1);
  // Viewports, screenshots, overflow, navigation at mobile size.
  for(const width of [320,390,768,1024,1440]){
   await page.setViewportSize({width,height:960});
-  await page.waitForTimeout(70);
+  await page.waitForTimeout(300);
   const dims=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,inner:innerWidth,body:document.body.scrollWidth}));
   assert.ok(dims.scroll<=width+1,'Document overflow at '+width+': '+JSON.stringify(dims));
   await page.screenshot({path:'artifacts/browser/workdesk-'+width+'.png',fullPage:true});
@@ -57,10 +58,11 @@ try{
  await page.locator('input[name="annotationChecked"]').check();await submit();
  await page.locator('input[name="draftRef"]').fill('SAMPLE-CERT-0142');await submit();
  await page.locator('select[name="reviewer"]').selectOption({label:'Parish administrator'});await submit();
- await page.locator('input[name="approvalAttested"]').check();
+ await page.locator('input[name="approvalAttested"]').check();await submit();
+ assert.match(await page.locator('.case-heading').innerText(),/Ready for release/);
  await page.locator('input[name="recipientChecked"]').check();await submit();
  assert.match(await page.locator('.case-heading').innerText(),/Demo released/);
- assert.equal(await page.locator('.timeline li').count(),6);
+ assert.equal(await page.locator('.timeline li').count(),7);
  await page.locator('[data-preview="CERT-0142"]').click();
  assert.match(await page.locator('#printDialog').innerText(),/SAMPLE · INVALID/);
  await page.screenshot({path:'artifacts/browser/certificate-sample-print-preview.png',fullPage:true});
@@ -104,7 +106,7 @@ try{
  assert.match(await page.locator('#caseRows').innerText(),/No fictional cases match/);
  await page.reload({waitUntil:'networkidle'});
  assert.match(await page.locator('#content').innerText(),/Rectory office workdesk/);
- assert.equal(await page.locator('.kpi').first().innerText().then(t=>t.includes('3')),true);
+ assert.equal(await page.locator('.kpi').first().innerText().then(t=>t.includes('4')),true);
  assert.deepEqual(errors,[]);
  console.log('PASS: real Chromium desk, 5 viewport screenshots/no overflow, shortcut/menu, denied role, all 3 case journeys, audit, print preview, reset.');
 }finally{

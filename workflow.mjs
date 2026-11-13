@@ -6,7 +6,8 @@ export const WORKFLOWS = {
     {action:'verify_source',title:'Verify source register',to:'Register verified',roles:['administrator','records'],fields:['sourceRef','annotationChecked']},
     {action:'prepare_draft',title:'Prepare sample certificate',to:'Draft prepared',roles:['administrator','secretary','records'],fields:['draftRef']},
     {action:'queue_authorization',title:'Route for simulated authorization',to:'Awaiting approval',roles:['administrator','secretary','records'],fields:['reviewer']},
-    {action:'demo_release',title:'Log fictional release',to:'Demo released',roles:['administrator'],fields:['approvalAttested','recipientChecked']}
+    {action:'confirm_demo_approval',title:'Record simulated approval clearance',to:'Ready for release',roles:['administrator'],fields:['approvalAttested']},
+    {action:'demo_release',title:'Log fictional release',to:'Demo released',roles:['administrator','secretary'],fields:['recipientChecked']}
   ],
   correspondence:[
     {action:'classify',title:'Classify incoming correspondence',to:'Classified',roles:['administrator','secretary','clerk'],fields:['classification']},
@@ -32,7 +33,15 @@ function event(what,at,by,reference,note,from,to) {
 export function seedCases(){
   return [
     {id:'CERT-0142',kind:'certificate',subject:'Sample Applicant A',summary:'Baptismal certificate for marriage preparation',owner:'Records officer',priority:'High',received:'2026-11-10',due:'2026-11-14',status:'Received',step:0,sourceRef:'BAPT / VOL-02 / P.18 / 004',documents:['Request form','Authorization (if represented)','Register source'],metadata:{purpose:'Marriage preparation',annotations:'Restricted review pending',release:'Not issued'},history:[event('Request received','2026-11-10 09:12','Parish secretary','IN-0142','Front-desk intake recorded')]},
-    {id:'COR-0074',kind:'correspondence',subject:'Sample chapel maintenance memorandum',summary:'Incoming chapel coordinator correspondence',owner:'Office clerk',priority:'Normal',received:'2026-11-11',due:'2026-11-17',status:'Received',step:0,sourceRef:'IN-2026-0074',documents:['Incoming letter','Supporting photo (fictional)'],metadata:{classification:'Unclassified',outgoing:'Not dispatched'},history:[event('Document received','2026-11-11 10:40','Office clerk','IN-2026-0074','Scanned document logged for routing')]},
+    {id:'CERT-0138',kind:'certificate',subject:'Sample Applicant H',summary:'Confirmation certificate awaiting fictional handover',owner:'Parish secretary',priority:'Normal',received:'2026-11-09',due:'2026-11-13',status:'Ready for release',step:5,sourceRef:'CONF / VOL-01 / P.42 / 011',documents:['Request form','Register source'],metadata:{purpose:'Parish requirement',annotations:'Reviewed in demonstration',release:'Pending fictional handover'},history:[
+       event('Request received','2026-11-09 09:05','Parish secretary','IN-0138','Fictional intake'),
+       event('Verify requester','2026-11-09 10:05','Records officer','IN-0138','Identity check simulated'),
+       event('Verify source register','2026-11-10 08:15','Records officer','CONF / VOL-01 / P.42 / 011','Sample reference reviewed'),
+       event('Prepare sample certificate','2026-11-10 09:00','Records officer','SAMPLE-CERT-0138','Sample draft prepared'),
+       event('Route for simulated authorization','2026-11-11 14:30','Parish secretary','SAMPLE-CERT-0138','Sent to demonstration queue'),
+       event('Record simulated approval clearance','2026-11-12 14:00','Office administrator','SAMPLE-CERT-0138','No actual official approval')]
+    },
+    {id:'COR-0074',kind:'correspondence',subject:'Sample chapel maintenance memorandum',summary:'Incoming chapel coordinator correspondence',owner:'Office clerk',priority:'Normal',received:'2026-11-11',due:'2026-11-12',status:'Received',step:0,sourceRef:'IN-2026-0074',documents:['Incoming letter','Supporting photo (fictional)'],metadata:{classification:'Unclassified',outgoing:'Not dispatched'},history:[event('Document received','2026-11-11 10:40','Office clerk','IN-2026-0074','Scanned document logged for routing')]},
     {id:'MAR-0019',kind:'marriage',subject:'Sample Couple B & C',summary:'Marriage preparation and office readiness file',owner:'Parish secretary',priority:'High',received:'2026-11-08',due:'2026-11-19',status:'Missing requirements',step:0,sourceRef:'MAR-2026-0019',documents:['Baptismal certificates','Confirmation certificates','CENOMAR','Pre-Cana record'],verifiedDocs:['Baptismal certificates'],metadata:{ceremonyHeld:false,civilFiled:false,baptismParishNotified:false,booking:'Tentative only'},history:[event('Marriage file opened','2026-11-08 13:15','Parish secretary','MAR-2026-0019','Three verification items still outstanding')]}
   ];
 }
@@ -82,6 +91,7 @@ export function metrics(cases){
   return {
     open:cases.filter(c=>c.status!==FINAL[c.kind]).length,
     pending:cases.filter(c=>c.kind==='certificate'&&c.status!=='Demo released').length,
+    ready:cases.filter(c=>c.kind==='certificate'&&c.status==='Ready for release').length,
     overdue:cases.filter(c=>c.due<'2026-11-13'&&c.status!==FINAL[c.kind]).length,
     next:cases.filter(c=>nextStep(c)).length
   };

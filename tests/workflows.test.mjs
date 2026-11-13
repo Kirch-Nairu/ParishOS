@@ -4,7 +4,7 @@ import {seedCases,advance,toggleDocument,nextStep,metrics,FINAL} from '../workfl
 const at='2026-11-13 15:30';
 function run(c,a,p={},role='administrator'){return advance(c,a,p,role,at);}
 test('certificate custody: guarded, ordered, immutable source, sample-only release and replay denial',()=>{
- let c=seedCases()[0],before=JSON.stringify(c);
+ let c=seedCases().find(x=>x.id==='CERT-0142'),before=JSON.stringify(c);
  assert.equal(run(c,'demo_release',{}).ok,false);
  assert.equal(run(c,'verify_identity',{identityChecked:false}).ok,false);
  assert.equal(JSON.stringify(c),before);
@@ -13,16 +13,19 @@ test('certificate custody: guarded, ordered, immutable source, sample-only relea
  c=run(c,'verify_source',{sourceRef:c.sourceRef,annotationChecked:true},'records').item;
  c=run(c,'prepare_draft',{draftRef:'SAMPLE-CERT-0142'},'records').item;
  c=run(c,'queue_authorization',{reviewer:'Parish administrator'},'secretary').item;
- assert.equal(run(c,'demo_release',{approvalAttested:true,recipientChecked:true},'secretary').ok,false);
- assert.equal(run(c,'demo_release',{approvalAttested:false,recipientChecked:true}).ok,false);
- c=run(c,'demo_release',{approvalAttested:true,recipientChecked:true}).item;
+ assert.equal(run(c,'demo_release',{recipientChecked:true},'secretary').ok,false);
+ assert.equal(run(c,'confirm_demo_approval',{approvalAttested:false}).ok,false);
+ c=run(c,'confirm_demo_approval',{approvalAttested:true}).item;
+ assert.equal(c.status,'Ready for release');
+ assert.equal(run(c,'demo_release',{recipientChecked:true},'records').ok,false);
+ c=run(c,'demo_release',{recipientChecked:true},'secretary').item;
  assert.equal(c.status,FINAL.certificate);
- assert.equal(c.history.length,6);
+ assert.equal(c.history.length,7);
  assert.match(c.metadata.release,/no certificate issued/);
  assert.equal(run(c,'demo_release',{approvalAttested:true,recipientChecked:true}).ok,false);
 });
 test('correspondence: assign before dispatch, due date, outgoing ref and final archive trail',()=>{
- let c=seedCases()[1];
+ let c=seedCases().find(x=>x.id==='COR-0074');
  assert.equal(run(c,'assign',{owner:'Office clerk',dueDate:'2026-11-16'}).ok,false);
  c=run(c,'classify',{classification:'Facilities'}).item;
  assert.equal(run(c,'assign',{owner:'Office clerk',dueDate:'bad-date'}).ok,false);
@@ -37,7 +40,7 @@ test('correspondence: assign before dispatch, due date, outgoing ref and final a
  assert.equal(c.metadata.outgoing,'OUT-2026-040');
 });
 test('marriage: missing checklist blocks review and civil/post-ceremony obligations remain separate',()=>{
- let c=seedCases()[2];
+ let c=seedCases().find(x=>x.id==='MAR-0019');
  c=run(c,'request_followup',{followupNote:'Please submit missing documents'}).item;
  assert.equal(run(c,'verify_requirements',{docsVerified:true}).ok,false);
  for(const doc of c.documents){if(!c.verifiedDocs.includes(doc))c=toggleDocument(c,doc).item;}
@@ -56,8 +59,10 @@ test('marriage: missing checklist blocks review and civil/post-ceremony obligati
 });
 test('seeds are fictional and fresh; queues derived from case states',()=>{
  const a=seedCases(),b=seedCases();
- assert.notEqual(a[0],b[0]);assert.equal(a.length,3);
- assert.equal(metrics(a).open,3);
+ assert.notEqual(a[0],b[0]);assert.equal(a.length,4);
+ assert.equal(metrics(a).open,4);
+ assert.equal(metrics(a).ready,1);
+ assert.equal(metrics(a).overdue,1);
  assert.equal(nextStep(a[0]).action,'verify_identity');
  assert.equal(toggleDocument(a[0],'CENOMAR').ok,false);
 });
