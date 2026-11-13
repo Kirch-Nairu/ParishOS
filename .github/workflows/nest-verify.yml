@@ -1,0 +1,32 @@
+name: NEST ParishOS static verification
+on:
+  push:
+    branches:
+      - feat/nest-parishos-static-showcase-r1
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  static-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact candidate
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Confirm host tools
+        run: |
+          node --version
+          npm --version
+      - name: Parse, test, and build
+        run: npm run build
+      - name: Confirm export
+        run: |
+          test -s dist/index.html
+          test -s dist/styles.css
+          test -s dist/app.js
+          test -s dist/robots.txt
+          grep -q "SAMPLE · INVALID" dist/index.html
+          grep -q "Disallow: /" dist/robots.txt
