@@ -21,7 +21,7 @@ test('certificate custody: guarded, ordered, immutable source, sample-only relea
  c=run(c,'demo_release',{recipientChecked:true},'secretary').item;
  assert.equal(c.status,FINAL.certificate);
  assert.equal(c.history.length,7);
- assert.match(c.metadata.release,/no certificate issued/);
+ assert.match(c.metadata.release,/no official certificate issued/);
  assert.equal(run(c,'demo_release',{approvalAttested:true,recipientChecked:true}).ok,false);
 });
 test('correspondence: assign before dispatch, due date, outgoing ref and final archive trail',()=>{

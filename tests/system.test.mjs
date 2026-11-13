@@ -69,7 +69,7 @@ test('expense approval needs separate administrator attestation in demo',()=>{
  const result=transition(c,'administrator');
  assert.equal(result.ok,true);
  assert.equal(result.record.status,'Approved (demo)');
- assert.equal(result.record.fields.find(x=>x.label==='Payment').value,'No real disbursement');
+ assert.equal(result.record.fields.find(x=>x.label==='Payment').value,'Payment not initiated');
 });
 test('restricted donation remains purpose-bound after status transition',()=>{
  const c=createModuleData().find(x=>x.id==='DON-043');
@@ -107,7 +107,7 @@ test('record actions preserve visible timeline and reset data on demand',()=>{
  const state=createShowcaseState();
  const seed=state.records.find(r=>r.id==='BAP-026');
  const denied=onShowcaseClick({dataset:{sysNext:'BAP-026'}},state,'secretary');
- assert.match(denied.message,/Check every sponsor/);
+ assert.match(denied.message,/Complete the sponsor/);
  for(let i=0;i<seed.docs.length;i++){
   const result=onShowcaseClick({dataset:{sysCheck:'BAP-026',sysDoc:String(i)}},state,'secretary');
   assert.equal(result.refresh,true);

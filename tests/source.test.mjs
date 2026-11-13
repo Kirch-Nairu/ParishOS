@@ -15,7 +15,7 @@ test('R2 desk-first IA, secondary priest and meaningful case-route UI',()=>{
 });
 test('demo safety, invalid print and no live data exchange',()=>{
  assert.match(html,/SAMPLE · INVALID/);
- assert.match(html,/No data is stored or sent/);
+ assert.match(html,/Changes stay in this browser and reset on refresh/);
  assert.match(js,/SAMPLE · INVALID/);
  assert.match(js,/NO OFFICIAL SEAL/);
  assert.doesNotMatch(js,/\bfetch\s*\(|XMLHttpRequest|sendBeacon|localStorage|sessionStorage|indexedDB/i);
